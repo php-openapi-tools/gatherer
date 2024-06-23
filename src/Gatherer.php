@@ -28,7 +28,6 @@ final class Gatherer
         );
         $contractRegistry = new Registry\Contract();
 
-        $contracts               = [];
         $schemas                 = [];
         $throwableSchemaRegistry = new Registry\ThrowableSchema();
         if (count($spec->components->schemas ?? []) > 0) {
@@ -52,7 +51,6 @@ final class Gatherer
                 assert($schema instanceof \cebe\openapi\spec\Schema);
                 $schema    = Schema::gather(Utils::className($name), $schema, $schemaRegistry, $contractRegistry);
                 $schemas[] = $schema;
-                $contracts = [...$contracts, ...$schema->contracts];
             }
         }
 
@@ -93,6 +91,12 @@ final class Gatherer
                 );
             }
         }
+
+        do {
+            foreach ($schemaRegistry->unknownSchemas() as $schema) {
+                $schemas[] = Schema::gather(Utils::className($schema->className), $schema->schema, $schemaRegistry, $contractRegistry);
+            }
+        } while($schemaRegistry->hasUnknownSchemas());
 
         return new Representation\Representation(
             new Representation\Client(
