@@ -96,7 +96,7 @@ final class Gatherer
             foreach ($schemaRegistry->unknownSchemas() as $schema) {
                 $schemas[] = Schema::gather(Utils::className($schema->className), $schema->schema, $schemaRegistry, $contractRegistry);
             }
-        } while($schemaRegistry->hasUnknownSchemas());
+        } while ($schemaRegistry->hasUnknownSchemas());
 
         return new Representation\Representation(
             new Representation\Client(

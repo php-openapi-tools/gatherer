@@ -4,4 +4,4 @@ parameters:
 		- '#Call to function in_array\(\) requires parameter \#3 to be true.#'
 		- '#with a nullable type declaration.#'
 includes:
-	- ../../vendor/wyrihaximus/test-utilities/rules.neon
+	- ../../vendor/wyrihaximus/async-test-utilities/rules.neon
