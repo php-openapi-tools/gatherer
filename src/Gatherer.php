@@ -11,6 +11,8 @@ use OpenAPITools\Representation;
 use OpenAPITools\Utils\Utils;
 use RuntimeException;
 
+use function array_map;
+use function array_unique;
 use function assert;
 use function count;
 use function strlen;
@@ -104,7 +106,20 @@ final class Gatherer
                 $paths,
             ),
             $webHooks,
-            $schemas,
+            array_map(static fn (Representation\Schema $schema): Representation\Schema => new Representation\Schema(
+                $schema->className,
+                $schema->contracts,
+                $schema->errorClassName,
+                $schema->errorClassNameAliased,
+                $schema->title,
+                $schema->description,
+                $schema->example,
+                $schema->properties,
+                $schema->schema,
+                $schema->isArray,
+                $schema->type,
+                array_unique([...$schemaRegistry->aliasesForClassName($schema->className)]),
+            ), $schemas),
         );
     }
 }
