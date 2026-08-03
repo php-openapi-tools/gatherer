@@ -6,6 +6,7 @@ namespace OpenAPITools\Gatherer;
 
 use cebe\openapi\spec\OpenApi;
 use OpenAPITools\Configuration\Gathering;
+use OpenAPITools\Configuration\Gathering\Voter;
 use OpenAPITools\Registry;
 use OpenAPITools\Representation;
 use OpenAPITools\Utils\Utils;
@@ -15,9 +16,10 @@ use function array_map;
 use function array_unique;
 use function assert;
 use function count;
-use function strlen;
+use function is_string;
 use function trim;
 
+/** @api */
 final class Gatherer
 {
     public static function gather(
@@ -32,71 +34,87 @@ final class Gatherer
 
         $schemas                 = [];
         $throwableSchemaRegistry = new Registry\ThrowableSchema();
-        if (count($spec->components->schemas ?? []) > 0) {
+        $components              = $spec->components;
+        if ($components !== null && count($components->schemas ?? []) > 0) {
             /**
              * Do this loop twice to ensure we added all schemas to the schema registry BEFORE we start to gather them
              * which will trigger looking up schemas as properties and end up with weird naming.
-             *
-             * @phpstan-ignore-next-line
              */
-            foreach ($spec->components->schemas as $name => $schema) {
+            foreach ($components->schemas as $name => $schema) {
                 assert($schema instanceof \cebe\openapi\spec\Schema);
-                $schemaRegistry->addClassName(Utils::className($name), $schema);
+                $schemaRegistry->addClassName(Utils::className((string) $name), $schema);
             }
 
             /**
              * Gather all the schemas now that we've added all of them to the schema registry.
-             *
-             * @phpstan-ignore-next-line
              */
-            foreach ($spec->components->schemas as $name => $schema) {
-                assert($schema instanceof \cebe\openapi\spec\Schema);
-                $schema    = Schema::gather(Utils::className($name), $schema, $schemaRegistry, $contractRegistry);
-                $schemas[] = $schema;
+            foreach ($components->schemas as $name => $openApiSchema) {
+                assert($openApiSchema instanceof \cebe\openapi\spec\Schema);
+                $className           = Utils::className((string) $name);
+                $gatheredSchema      = Schema::gather($className, $openApiSchema, $schemaRegistry, $contractRegistry);
+                $schemas[$className] = $gatheredSchema;
             }
         }
 
-        /** @var array<Representation\WebHook> $webHooks */
+        /** @var array<Representation\WebHookEvent> $webHooks */
         $webHooks = [];
         if (count($spec->webhooks ?? []) > 0) {
+            /** @var array<string, array<Representation\WebHook>> $webHooksPerEvent */
+            $webHooksPerEvent = [];
             foreach ($spec->webhooks as $webHook) {
                 try {
-                    $webHooks[] = WebHook::gather($webHook, $schemaRegistry, $contractRegistry);
-                    /** @phpstan-ignore-next-line */
+                    $gatheredWebHook = WebHook::gather($webHook, $schemaRegistry, $contractRegistry);
                 } catch (RuntimeException) {
                     // @ignoreException
+                    continue;
                 }
+
+                $webHooksPerEvent[$gatheredWebHook->event][] = $gatheredWebHook;
+            }
+
+            foreach ($webHooksPerEvent as $event => $eventWebHooks) {
+                $webHooks[] = new Representation\WebHookEvent(
+                    $event,
+                    WebHookHydrator::gather($event, ...$eventWebHooks),
+                    $eventWebHooks,
+                );
             }
         }
 
         $paths = [];
         if (count($spec->paths ?? []) > 0) {
             foreach ($spec->paths as $path => $pathItem) {
-                if ($path === '/') {
-                    $pathClassName = 'Root';
-                } else {
-                    $pathClassName = trim(Utils::className($path), '\\');
+                if (! is_string($path)) {
+                    continue;
                 }
 
-                if (strlen($path) === 0 || strlen($pathClassName) === 0) {
+                $pathString = $path;
+                if ($pathString === '/') {
+                    $pathClassName = 'Root';
+                } else {
+                    $pathClassName = trim(Utils::className($pathString), '\\');
+                }
+
+                if ($pathClassName === '') {
                     continue;
                 }
 
                 $paths[] = Path::gather(
                     $pathClassName,
-                    $path,
+                    $pathString,
                     $pathItem,
                     $schemaRegistry,
                     $contractRegistry,
                     $throwableSchemaRegistry,
-                    $configuration->voter,
+                    $configuration->voter ?? new Voter(null, null),
                 );
             }
         }
 
         do {
             foreach ($schemaRegistry->unknownSchemas() as $schema) {
-                $schemas[] = Schema::gather(Utils::className($schema->className), $schema->schema, $schemaRegistry, $contractRegistry);
+                $className           = Utils::className($schema->className);
+                $schemas[$className] = Schema::gather($className, $schema->schema, $schemaRegistry, $contractRegistry);
             }
         } while ($schemaRegistry->hasUnknownSchemas());
 

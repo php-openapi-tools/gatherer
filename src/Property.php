@@ -20,7 +20,7 @@ use function is_array;
 use function is_string;
 use function preg_replace_callback;
 use function property_exists;
-use function str_pad;
+use function str_repeat;
 use function str_replace;
 use function strlen;
 
@@ -37,23 +37,23 @@ final class Property
         $enum        = [];
         $exampleData = null;
 
-        if (property_exists($property, 'examples') && count($property->examples ?? []) > 0) {
-            $examples = array_values(array_filter($property->examples, static fn (mixed $value): bool => $value !== null));
+        $examplesProperty = property_exists($property, 'examples') ? $property->examples : null;
+        if (is_array($examplesProperty) && count($examplesProperty) > 0) {
+            $examples = array_values(array_filter($examplesProperty, static fn (mixed $value): bool => $value !== null));
             // Main reason we're doing this is so we cause more variety in the example data when a list of examples is provided, but also consistently pick the same item so we do don't cause code churn
-            /** @phpstan-ignore-next-line */
-            $exampleData = $examples[strlen($sourcePropertyName) % 2 ? 0 : count($examples) - 1];
+            $exampleData = $examples[strlen($sourcePropertyName) % 2 !== 0 ? 0 : count($examples) - 1];
         }
 
         if ($exampleData === null && property_exists($property, 'example') && $property->example !== null) {
             $exampleData = $property->example;
         }
 
-        if ($exampleData === null && property_exists($property, 'enum') && count($property->enum ?? []) > 0) {
-            $enum  = $property->enum;
-            $enums = array_values(array_filter($property->enum, static fn (mixed $value): bool => $value !== null));
+        $propertyEnum = $property->enum ?? [];
+        if ($exampleData === null && count($propertyEnum) > 0) {
+            $enum  = $propertyEnum;
+            $enums = array_values(array_filter($propertyEnum, static fn (mixed $value): bool => $value !== null));
             // Main reason we're doing this is so we cause more variety in the enum based example data, but also consistently pick the same item so we do don't cause code churn
-            /** @phpstan-ignore-next-line */
-            $exampleData = $enums[strlen($sourcePropertyName) % 2 ? 0 : count($enums) - 1];
+            $exampleData = $enums[strlen($sourcePropertyName) % 2 !== 0 ? 0 : count($enums) - 1];
         }
 
         $propertyName = str_replace([
@@ -68,10 +68,8 @@ final class Property
             '_DOLLAR_',
         ], $sourcePropertyName);
         $propertyName = preg_replace_callback(
-            '/[0-9]+/',
-            static function ($matches) {
-                return '_' . str_replace(['-', ' '], '_', NumberToWords::transformNumber('en', (int) $matches[0])) . '_';
-            },
+            '/\d+/',
+            static fn (array $matches): string => '_' . str_replace(['-', ' '], '_', NumberToWords::transformNumber('en', (int) $matches[0])) . '_',
             $propertyName,
         );
         assert(is_string($propertyName));
@@ -90,10 +88,17 @@ final class Property
             $arrayItemsNode = [];
 
             foreach ($type->payload as $index => $arrayItem) {
+                if ($arrayItem->type === 'union' && is_array($arrayItem->payload)) {
+                    $payloadIndex        = array_key_exists($index, $arrayItem->payload) ? $index : 0;
+                    $arrayItemForExample = $arrayItem->payload[$payloadIndex];
+                } else {
+                    $arrayItemForExample = $arrayItem;
+                }
+
                 $arrayItemExampleData = ExampleData::gather(
                     $exampleData,
-                    $arrayItem->type === 'union' ? $arrayItem->payload[(array_key_exists($index, $arrayItem->payload) ? $index : 0)] : $arrayItem, /** @phpstan-ignore-line */
-                    $propertyName . str_pad('', $index + 1, '_'),
+                    $arrayItemForExample,
+                    $propertyName . str_repeat('_', (int) $index + 1),
                 );
                 $arrayItemsRaw[]      = $arrayItemExampleData->raw;
                 $arrayItemsNode[]     = new Node\Expr\ArrayItem($arrayItemExampleData->node);
@@ -110,7 +115,7 @@ final class Property
                     $exampleData = ExampleData::gather(
                         $exampleData,
                         $arrayItem->payload,
-                        $propertyName . str_pad('', $index + 1, '_'),
+                        $propertyName . str_repeat('_', (int) $index + 1),
                     );
                     continue;
                 }
@@ -122,15 +127,19 @@ final class Property
                 $exampleData = ExampleData::gather(
                     null,
                     $arrayItem,
-                    $propertyName . str_pad('', $index + 1, '_'),
+                    $propertyName . str_repeat('_', (int) $index + 1),
                 );
             }
         } else {
             $exampleData = ExampleData::gather($exampleData, $type, $propertyName);
         }
 
+        if (! $exampleData instanceof Representation\ExampleData) {
+            $exampleData = ExampleData::determiteType($exampleData);
+        }
+
         return new Representation\Property(
-            (new Convert($propertyName))->toCamel(),
+            new Convert($propertyName)->toCamel(),
             $sourcePropertyName,
             $property->description ?? '',
             $exampleData,

@@ -14,6 +14,7 @@ use function in_array;
 use function is_array;
 use function property_exists;
 
+/** @api */
 final class CompositSchema
 {
     public static function gather(
@@ -22,25 +23,23 @@ final class CompositSchema
         Registry\Schema $schemaRegistry,
         Registry\Contract $contractRegistry,
     ): Representation\Schema {
-        $className  = Utils::className($className);
-        $isArray    = $schema->type === 'array';
-        $properties = [];
-        $example    = [];
+        $className    = Utils::className($className);
+        $isArray      = $schema->type === 'array';
+        $objectSchema = OpenApiSpec::objectSchema($schema);
+        $properties   = [];
+        $example      = [];
 
-        if ($isArray) {
-            $schema = $schema->items;
-        }
-
-        foreach ($schema->properties as $propertyName => $property) {
+        foreach ($objectSchema->properties ?? [] as $propertyName => $property) {
+            $propertySchema   = OpenApiSpec::schema($property);
             $gatheredProperty = Property::gather(
                 $className,
                 (string) $propertyName,
                 in_array(
                     (string) $propertyName,
-                    $schema->required ?? [],
-                    false,
+                    OpenApiSpec::requiredProperties($objectSchema),
+                    true,
                 ),
-                $property,
+                $propertySchema,
                 $schemaRegistry,
                 $contractRegistry,
             );
@@ -53,14 +52,14 @@ final class CompositSchema
                     break;
                 }
 
-                if (! property_exists($schema, $examplePropertyName) || ! is_array($schema->$examplePropertyName) || ! array_key_exists($gatheredProperty->sourceName, $schema->$examplePropertyName)) {
+                if (! property_exists($objectSchema, $examplePropertyName) || ! is_array($objectSchema->$examplePropertyName) || ! array_key_exists($gatheredProperty->sourceName, $objectSchema->$examplePropertyName)) {
                     continue;
                 }
 
-                $example[$gatheredProperty->sourceName] = $schema->$examplePropertyName[$gatheredProperty->sourceName];
+                $example[$gatheredProperty->sourceName] = $objectSchema->$examplePropertyName[$gatheredProperty->sourceName];
             }
 
-            foreach ($property->enum ?? [] as $value) {
+            foreach ($propertySchema->enum ?? [] as $value) {
                 $example[$gatheredProperty->sourceName] = $value;
                 break;
             }
@@ -72,8 +71,8 @@ final class CompositSchema
             if (
                 in_array(
                     (string) $propertyName,
-                    $schema->required ?? [],
-                    false,
+                    OpenApiSpec::requiredProperties($objectSchema),
+                    true,
                 )
             ) {
                 continue;
@@ -86,19 +85,19 @@ final class CompositSchema
             'Schema\\' . $className,
             [
                 new Representation\Contract(
-                    $contractRegistry->get($schema, 'Contract\\' . $className),
+                    $contractRegistry->get($objectSchema, 'Contract\\' . $className),
                     $properties,
                 ),
             ],
             'Error\\' . $className,
             'ErrorSchemas\\' . $className,
-            $schema->title ?? '',
-            $schema->description ?? '',
+            $objectSchema->title ?? '',
+            $objectSchema->description ?? '',
             $example,
             $properties,
             $schema,
             $isArray,
-            ($schema->type === null ? ['object'] : (is_array($schema->type) ? $schema->type : [$schema->type])),
+            OpenApiSpec::schemaTypeList($objectSchema),
             [],
         );
     }

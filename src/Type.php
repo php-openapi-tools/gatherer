@@ -9,6 +9,7 @@ use NumberToWords\NumberToWords;
 use OpenAPITools\Registry;
 use OpenAPITools\Representation\Property\Type as PropertyType;
 use OpenAPITools\Utils\Utils;
+use RuntimeException;
 
 use function array_filter;
 use function count;
@@ -29,10 +30,10 @@ final class Type
         Registry\Schema $schemaRegistry,
         Registry\Contract $contractRegistry,
     ): PropertyType {
-        $type     = $property->type;
-        $nullable = ! $required;
+        $propertyTypeValue = $property->type;
+        $nullable          = ! $required;
 
-        if (is_array($property->allOf) && count($property->allOf) > 0) {
+        if (count($property->allOf ?? []) > 0) {
             return new PropertyType(
                 'object',
                 null,
@@ -50,16 +51,21 @@ final class Type
             );
         }
 
-        if (is_array($property->oneOf) && count($property->oneOf) > 0) {
+        if (count($property->oneOf ?? []) > 0) {
             // Check if nullable
             if (
                 count($property->oneOf) === 2 &&
-                count(array_filter($property->oneOf, static fn (BaseSchema $schema): bool => $schema->type === 'null')) === 1
+                count(array_filter($property->oneOf, static fn (mixed $schema): bool => OpenApiSpec::schema($schema)->type === 'null')) === 1
             ) {
+                $nonNullSchema = current(array_filter($property->oneOf, static fn (mixed $schema): bool => OpenApiSpec::schema($schema)->type !== 'null'));
+                if ($nonNullSchema === false) {
+                    throw new RuntimeException('Expected at least one non-null oneOf schema');
+                }
+
                 return self::gather(
                     $className,
                     $propertyName,
-                    current(array_filter($property->oneOf, static fn (BaseSchema $schema): bool => $schema->type !== 'null')),
+                    OpenApiSpec::schema($nonNullSchema),
                     false,
                     $schemaRegistry,
                     $contractRegistry,
@@ -79,11 +85,11 @@ final class Type
                         Registry\Schema $schemaRegistry,
                         Registry\Contract $contractRegistry,
                     ): iterable {
-                        foreach ($properties as $index => $property) {
+                        foreach ($properties as $index => $oneOfProperty) {
                             yield self::gather(
                                 $className,
                                 $propertyName . '\\' . NumberToWords::transformNumber('en', $index),
-                                $property,
+                                OpenApiSpec::schema($oneOfProperty),
                                 $required,
                                 $schemaRegistry,
                                 $contractRegistry,
@@ -102,16 +108,21 @@ final class Type
             );
         }
 
-        if (is_array($property->anyOf) && count($property->anyOf) > 0) {
+        if (count($property->anyOf ?? []) > 0) {
             // Check if nullable
             if (
                 count($property->anyOf) === 2 &&
-                count(array_filter($property->anyOf, static fn (BaseSchema $schema): bool => $schema->type === 'null')) === 1
+                count(array_filter($property->anyOf, static fn (mixed $schema): bool => OpenApiSpec::schema($schema)->type === 'null')) === 1
             ) {
+                $nonNullSchema = current(array_filter($property->anyOf, static fn (mixed $schema): bool => OpenApiSpec::schema($schema)->type !== 'null'));
+                if ($nonNullSchema === false) {
+                    throw new RuntimeException('Expected at least one non-null anyOf schema');
+                }
+
                 return self::gather(
                     $className,
                     $propertyName,
-                    current(array_filter($property->anyOf, static fn (BaseSchema $schema): bool => $schema->type !== 'null')),
+                    OpenApiSpec::schema($nonNullSchema),
                     false,
                     $schemaRegistry,
                     $contractRegistry,
@@ -131,11 +142,11 @@ final class Type
                         Registry\Schema $schemaRegistry,
                         Registry\Contract $contractRegistry,
                     ): iterable {
-                        foreach ($properties as $index => $property) {
+                        foreach ($properties as $index => $anyOfProperty) {
                             yield self::gather(
                                 $className,
                                 $propertyName . '\\' . NumberToWords::transformNumber('en', $index),
-                                $property,
+                                OpenApiSpec::schema($anyOfProperty),
                                 $required,
                                 $schemaRegistry,
                                 $contractRegistry,
@@ -154,33 +165,40 @@ final class Type
             );
         }
 
+        $resolvedPropertyTypeValue = $propertyTypeValue;
+
         if (
-            is_array($type) &&
-            count($type) === 2 &&
+            is_array($propertyTypeValue) &&
+            count($propertyTypeValue) === 2 &&
             (
-                in_array(null, $type, false) ||
-                in_array('null', $type, false)
+                in_array(null, $propertyTypeValue, true) ||
+                in_array('null', $propertyTypeValue, true)
             )
         ) {
-            foreach ($type as $pt) {
-                /** @phpstan-ignore-next-line */
-                if ($pt !== null && $pt !== 'null') {
-                    $type = $pt;
+            $resolvedScalarType = 'object';
+            foreach ($propertyTypeValue as $pt) {
+                if ($pt !== 'null') {
+                    $resolvedScalarType = $pt;
                     break;
                 }
             }
 
-            $nullable = true;
+            $resolvedPropertyTypeValue = $resolvedScalarType;
+            $nullable                  = true;
         }
 
-        if ($type === 'array') {
+        if ($resolvedPropertyTypeValue === 'array') {
             $arrayItems = [];
 
             foreach (range(0, ($property->maxItems ?? $property->minItems ?? 2) - 1) as $index) {
+                if ($property->items === null) {
+                    throw new RuntimeException('Array property is missing items');
+                }
+
                 $arrayItems[] = self::gather(
                     $className,
                     $propertyName,
-                    $property->items,
+                    OpenApiSpec::schema($property->items),
                     $required,
                     $schemaRegistry,
                     $contractRegistry,
@@ -196,8 +214,8 @@ final class Type
             );
         }
 
-        if (is_string($type)) {
-            $type = str_replace([
+        $scalarType = is_string($resolvedPropertyTypeValue)
+            ? str_replace([
                 'integer',
                 'number',
                 'any',
@@ -209,12 +227,10 @@ final class Type
                 '',
                 '',
                 'bool',
-            ], $type);
-        } else {
-            $type = '';
-        }
+            ], $resolvedPropertyTypeValue)
+            : '';
 
-        if ($type === '') {
+        if ($scalarType === '') {
             return new PropertyType(
                 'scalar',
                 null,
@@ -224,7 +240,7 @@ final class Type
             );
         }
 
-        if ($type === 'object') {
+        if ($scalarType === 'object') {
             return new PropertyType(
                 'object',
                 null,
@@ -246,7 +262,7 @@ final class Type
             'scalar',
             $property->format ?? null,
             $property->pattern ?? null,
-            $type,
+            $scalarType,
             $nullable,
         );
     }

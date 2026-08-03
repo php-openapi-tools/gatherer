@@ -8,18 +8,22 @@ use Ckr\Util\ArrayMerger;
 use DateTimeInterface;
 use OpenAPITools\Representation;
 use PhpParser\Node;
+use PhpParser\Node\Expr\FuncCall;
 use ReverseRegex\Generator\Scope;
+use ReverseRegex\Generator\Scope as GeneratorScope;
 use ReverseRegex\Lexer;
 use ReverseRegex\Parser;
+use RuntimeException;
 
+use function date;
 use function explode;
 use function gettype;
+use function in_array;
 use function is_array;
 use function is_string;
-use function Safe\date;
-use function Safe\json_encode;
+use function json_encode;
+use function str_contains;
 use function strlen;
-use function strpos;
 
 final class ExampleData
 {
@@ -40,7 +44,9 @@ final class ExampleData
                 return self::gather($exampleData, $type->payload, $propertyName);
             }
 
-            return new Representation\ExampleData($exampleData, $exampleData instanceof Node\Expr ? $exampleData : self::turnArrayIntoNode((array) $exampleData));
+            $exampleDataArray = is_array($exampleData) ? $exampleData : [];
+
+            return new Representation\ExampleData($exampleDataArray, $exampleData instanceof Node\Expr ? $exampleData : self::turnArrayIntoNode($exampleDataArray));
         }
 
         if ($type->payload instanceof Representation\Schema) {
@@ -50,7 +56,7 @@ final class ExampleData
         }
 
         if ($exampleData === null && $type->type === 'scalar' && is_string($type->payload)) {
-            return self::scalarData(strlen($propertyName), $type->payload, $type->format, $type->pattern);
+            return self::scalarData(strlen($propertyName), $type->payload, $type->format ?? '', $type->pattern ?? '');
         }
 
         return self::determiteType($exampleData);
@@ -91,10 +97,9 @@ final class ExampleData
         };
     }
 
-    /** @phpstan-ignore-next-line */
-    public static function scalarData(int $seed, string $type, string|null $format, string|null $pattern = null): Representation\ExampleData
+    public static function scalarData(int $seed, string $type, string $format = '', string $pattern = ''): Representation\ExampleData
     {
-        if (strpos($type, '|') !== false) {
+        if (str_contains($type, '|')) {
             [$firstType] = explode('|', $type);
 
             return self::scalarData($seed, $firstType, $format, $pattern);
@@ -104,7 +109,7 @@ final class ExampleData
             return new Representation\ExampleData($seed, new Node\Scalar\LNumber($seed));
         }
 
-        if ($type === 'float' || $type === '?float' || $type === 'int|float' || $type === 'null|int|float') {
+        if (in_array($type, ['float', '?float', 'int|float', 'null|int|float'], true)) {
             return new Representation\ExampleData($seed / 10, new Node\Scalar\DNumber($seed / 10));
         }
 
@@ -120,11 +125,21 @@ final class ExampleData
         }
 
         if ($type === 'string' || $type === '?string') {
-            if ($pattern !== null) {
+            if ($pattern !== '') {
                 $result = '';
 
-                /** @phpstan-ignore-next-line */
-                @(new Parser(new Lexer($pattern), new Scope(), new Scope()))->parse()->getResult()->generate(
+                $parser      = new Parser(new Lexer($pattern), new Scope(), new Scope());
+                $parseResult = $parser->parse();
+                if (! $parseResult instanceof Parser) {
+                    throw new RuntimeException('Expected parser to return itself');
+                }
+
+                $generator = $parseResult->getResult();
+                if (! $generator instanceof GeneratorScope) {
+                    throw new RuntimeException('Expected reverse regex generator scope');
+                }
+
+                $generator->generate(
                     $result,
                     new IntegerReturnerPretendingToBeARandomNumberGenerator(strlen($pattern)),
                 );
@@ -187,14 +202,17 @@ final class ExampleData
     }
 
     /** @param array<mixed> $array */
-    private static function turnArrayIntoNode(array $array): Node\Expr
+    private static function turnArrayIntoNode(array $array): FuncCall
     {
+        $jsonEncoded = json_encode([...self::arrayToRaw($array)]);
+        $encoded     = is_string($jsonEncoded) ? $jsonEncoded : '[]';
+
         return new Node\Expr\FuncCall(
             new Node\Name('\json_decode'),
             [
                 new Node\Arg(
                     new Node\Scalar\String_(
-                        json_encode([...self::arrayToRaw($array)]),
+                        $encoded,
                     ),
                 ),
                 new Node\Arg(
@@ -209,7 +227,7 @@ final class ExampleData
     }
 
     /**
-     * @param array<Representation\ExampleData|mixed> $exampleData
+     * @param array<mixed> $exampleData
      *
      * @return iterable<string, mixed>
      */

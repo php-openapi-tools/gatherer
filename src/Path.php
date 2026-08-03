@@ -11,7 +11,6 @@ use OpenAPITools\Representation;
 use OpenAPITools\Utils\Utils;
 
 use function is_array;
-use function strlen;
 
 final class Path
 {
@@ -22,14 +21,14 @@ final class Path
         Registry\Schema $schemaRegistry,
         Registry\Contract $contractRegistry,
         Registry\ThrowableSchema $throwableSchemaRegistry,
-        Voter|null $voters,
+        Voter $voters,
     ): Representation\Path {
         $className  = Utils::fixKeyword($className);
         $operations = [];
 
         foreach ($pathItem->getOperations() as $method => $operation) {
             $operationClassName = Utils::className($operation->operationId);
-            if (strlen($operationClassName) === 0) {
+            if ($operationClassName === '') {
                 continue;
             }
 
@@ -76,7 +75,7 @@ final class Path
 //                }
 //            }
 
-            if ($voters === null || ! is_array($voters->streamOperation)) {
+            if (! is_array($voters->streamOperation)) {
                 continue;
             }
 

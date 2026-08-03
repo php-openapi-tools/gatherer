@@ -14,24 +14,21 @@ final readonly class IntegerReturnerPretendingToBeARandomNumberGenerator impleme
 
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public function generate($min = 0, $max = null)
+    /** @phpstan-ignore ergebnis.noParameterWithNullDefaultValue (third-party GeneratorInterface requires null default) */
+    public function generate(mixed $min = 0, mixed $max = null): int
     {
-        return $this->randomNumber > $max ? $max : $this->randomNumber;
+        $maxValue = $max ?? \PHP_INT_MAX;
+
+        return $this->randomNumber > $maxValue ? $maxValue : $this->randomNumber;
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public function seed($seed = null)
+    public function seed(mixed $seed = 0): int
     {
         return $this->randomNumber;
     }
 
-    public function max()
+    public function max(): float
     {
-        return $this->randomNumber;
+        return (float) $this->randomNumber;
     }
 }
