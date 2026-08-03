@@ -7,8 +7,7 @@ namespace OpenAPITools\Gatherer;
 use cebe\openapi\spec\OpenApi;
 use OpenAPITools\Representation;
 
-use function strlen;
-
+/** @api */
 final class Client
 {
     public static function gather(
@@ -17,7 +16,7 @@ final class Client
     ): Representation\Client {
         $baseUrl = null;
         foreach ($spec->servers ?? [] as $server) {
-            if (strlen($server->url) === 0) {
+            if ($server->url === '') {
                 continue;
             }
 

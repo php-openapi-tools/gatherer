@@ -9,14 +9,14 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "ckr/arraymerger": "^3.0",
         "codeinc/http-reason-phrase-lookup": "^1.0",
         "devizzent/cebe-php-openapi": "^1.0.3",
         "eventsauce/object-hydrator": "^1.4",
         "jawira/case-converter": "^3.5.1",
         "kwn/number-to-words": "^2.9.1",
-        "nikic/php-parser": "^4.19.1",
+        "nikic/php-parser": "^5.0",
         "openapi-tools/configuration": "dev-main",
         "openapi-tools/contract": "dev-main",
         "openapi-tools/registry": "dev-main",
@@ -24,10 +24,12 @@
         "openapi-tools/utils": "dev-main",
         "pointybeard/reverse-regex": "1.0.0.3",
         "psr/http-message": "^1 || ^2 || ^3",
-        "thecodingmachine/safe": "^2.5"
+        "symfony/yaml": "^7.0"
     },
     "require-dev": {
-        "wyrihaximus/async-test-utilities": "^8.0.4"
+        "openapi-tools/test-data": "dev-main",
+        "wyrihaximus/async-test-utilities": "^13.5.1",
+        "wyrihaximus/makefiles": "^0.13.3"
     },
     "autoload": {
         "psr-4": {
@@ -41,23 +43,33 @@
     },
     "config": {
         "allow-plugins": {
+            "composer/package-versions-deprecated": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
+            "drupol/composer-packages": true,
             "ergebnis/composer-normalize": true,
+            "icanhazstring/composer-unused": true,
             "infection/extension-installer": true,
-            "wyrihaximus/composer-update-bin-autoload-path": true
+            "mindplay/composer-locator": true,
+            "phpstan/extension-installer": true,
+            "wyrihaximus/composer-update-bin-autoload-path": true,
+            "wyrihaximus/makefiles": true,
+            "wyrihaximus/test-utilities": true
         },
         "platform": {
-            "php": "8.2.13"
-        }
+            "php": "8.4.13"
+        },
+        "sort-packages": true
     },
     "scripts": {
         "post-install-cmd": [
             "composer normalize",
-            "composer update --lock --no-scripts"
+            "composer update --lock --no-scripts",
+            "make on-install-or-update || true"
         ],
         "post-update-cmd": [
             "composer normalize",
-            "composer update --lock --no-scripts"
+            "composer update --lock --no-scripts",
+            "make on-install-or-update || true"
         ]
     }
 }

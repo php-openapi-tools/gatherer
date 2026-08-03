@@ -28,18 +28,20 @@ final class IntersectionSchema
         $properties = [];
         $example    = [];
 
-        foreach ($baseProperty->allOf as $schema) {
+        foreach ($baseProperty->allOf ?? [] as $allOfSchema) {
+            $schema             = OpenApiSpec::schema($allOfSchema);
             $gatheredProperties = [];
-            foreach ($schema->properties as $propertyName => $property) {
-                $gatheredProperty = $gatheredProperties[(string) $propertyName]                            = Property::gather(
+            foreach ($schema->properties ?? [] as $propertyName => $property) {
+                $propertySchema   = OpenApiSpec::schema($property);
+                $gatheredProperty = $gatheredProperties[(string) $propertyName] = Property::gather(
                     $className,
                     (string) $propertyName,
                     in_array(
                         (string) $propertyName,
-                        $schema->required ?? [],
-                        false,
+                        OpenApiSpec::requiredProperties($schema),
+                        true,
                     ),
-                    $property,
+                    $propertySchema,
                     $schemaRegistry,
                     $contractRegistry,
                 );
@@ -58,7 +60,7 @@ final class IntersectionSchema
                     $example[$gatheredProperty->sourceName] = $schema->$examplePropertyName[$gatheredProperty->sourceName];
                 }
 
-                foreach ($property->enum ?? [] as $value) {
+                foreach ($propertySchema->enum ?? [] as $value) {
                     $example[$gatheredProperty->sourceName] = $value;
                     break;
                 }
@@ -70,8 +72,8 @@ final class IntersectionSchema
                 if (
                     in_array(
                         (string) $propertyName,
-                        $schema->required ?? [],
-                        false,
+                        OpenApiSpec::requiredProperties($schema),
+                        true,
                     )
                 ) {
                     continue;
@@ -80,8 +82,8 @@ final class IntersectionSchema
                 if (
                     in_array(
                         (string) $propertyName,
-                        $baseProperty->required ?? [],
-                        false,
+                        OpenApiSpec::requiredProperties($baseProperty),
+                        true,
                     )
                 ) {
                     continue;
@@ -91,7 +93,7 @@ final class IntersectionSchema
             }
 
             $contracts[] = new Contract(
-                $contractRegistry->get($schema, 'Contract\\' . $className . '\\' . $schema->title),
+                $contractRegistry->get($schema, 'Contract\\' . $className . '\\' . ($schema->title ?? '')),
                 $gatheredProperties,
             );
 
@@ -109,7 +111,7 @@ final class IntersectionSchema
             $properties,
             $baseProperty,
             false,
-            ($baseProperty->type === null ? ['object'] : (is_array($baseProperty->type) ? $baseProperty->type : [$baseProperty->type])),
+            OpenApiSpec::schemaTypeList($baseProperty),
             [],
         );
     }
