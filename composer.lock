@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f85f4d1b53124a498c0eb41f6b4be50",
+    "content-hash": "9ef236df3ab538e21411df24431b918e",
     "packages": [
         {
             "name": "ckr/arraymerger",
@@ -1034,16 +1034,16 @@
         },
         {
             "name": "pointybeard/reverse-regex",
-            "version": "1.0.0.3",
+            "version": "1.0.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pointybeard-forks/reverse-regex.git",
-                "reference": "a842e37c4f16367ad7b294a76a5e9671042683d8"
+                "reference": "c3cf66460cd827c1c4814dfb4e5d6def6db438ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pointybeard-forks/reverse-regex/zipball/a842e37c4f16367ad7b294a76a5e9671042683d8",
-                "reference": "a842e37c4f16367ad7b294a76a5e9671042683d8",
+                "url": "https://api.github.com/repos/pointybeard-forks/reverse-regex/zipball/c3cf66460cd827c1c4814dfb4e5d6def6db438ef",
+                "reference": "c3cf66460cd827c1c4814dfb4e5d6def6db438ef",
                 "shasum": ""
             },
             "require": {
@@ -1092,10 +1092,10 @@
             ],
             "support": {
                 "issues": "https://github.com/pointybeard-forks/ReverseRegex/issues",
-                "source": "https://github.com/pointybeard-forks/reverse-regex/tree/1.0.0.3",
+                "source": "https://github.com/pointybeard-forks/reverse-regex/tree/1.0.0.4",
                 "wiki": "https://github.com/pointybeard-forks/ReverseRegex/wiki"
             },
-            "time": "2022-04-20T04:32:05+00:00"
+            "time": "2024-04-17T03:40:03+00:00"
         },
         {
             "name": "psr/http-message",
