@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ef236df3ab538e21411df24431b918e",
+    "content-hash": "e996df7429b517064b530e19394369f7",
     "packages": [
         {
             "name": "ckr/arraymerger",
@@ -427,6 +427,67 @@
                 }
             ],
             "time": "2026-02-13T21:06:58+00:00"
+        },
+        {
+            "name": "ilario-pierbattista/reverse-regex",
+            "version": "0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ilario-pierbattista/ReverseRegex.git",
+                "reference": "09b92b2873bd4f4bdedce8ec341d4efd156b6478"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ilario-pierbattista/ReverseRegex/zipball/09b92b2873bd4f4bdedce8ec341d4efd156b6478",
+                "reference": "09b92b2873bd4f4bdedce8ec341d4efd156b6478",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/collections": "^1.6.5",
+                "doctrine/lexer": "^1.2.1 || ^2",
+                "php": "^8.1",
+                "symfony/polyfill-mbstring": "^1.20.0"
+            },
+            "conflict": {
+                "icomefromthenet/reverse-regex": "*"
+            },
+            "require-dev": {
+                "facile-it/facile-coding-standard": "1.3.1",
+                "friendsofphp/php-cs-fixer": "3.88.2",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPStats": "src/",
+                    "ReverseRegex": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lewis Dyer",
+                    "email": "getintouch@icomefromthenet.com",
+                    "homepage": "http://www.icomefromthenet.com"
+                }
+            ],
+            "description": "Convert Regular Expressions into text, for testing. Fork of icomefromthenet/reverse-regex",
+            "homepage": "https://github.com/ilario-pierbattista/ReverseRegex",
+            "keywords": [
+                "generator",
+                "regex",
+                "test data",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/ilario-pierbattista/ReverseRegex/issues",
+                "source": "https://github.com/ilario-pierbattista/ReverseRegex/tree/0.6.0"
+            },
+            "time": "2026-03-31T04:46:46+00:00"
         },
         {
             "name": "jawira/case-converter",
@@ -1031,71 +1092,6 @@
                 }
             ],
             "time": "2026-08-03T14:47:34+00:00"
-        },
-        {
-            "name": "pointybeard/reverse-regex",
-            "version": "1.0.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pointybeard-forks/reverse-regex.git",
-                "reference": "c3cf66460cd827c1c4814dfb4e5d6def6db438ef"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pointybeard-forks/reverse-regex/zipball/c3cf66460cd827c1c4814dfb4e5d6def6db438ef",
-                "reference": "c3cf66460cd827c1c4814dfb4e5d6def6db438ef",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/collections": "^1.6",
-                "doctrine/lexer": "^1.2",
-                "php": ">=7.2",
-                "symfony/polyfill-mbstring": "^1.23"
-            },
-            "require-dev": {
-                "damianopetrungaro/php-commitizen": "^0.1.2",
-                "friendsofphp/php-cs-fixer": "^3.0",
-                "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpunit/phpunit": "^9.5",
-                "squizlabs/php_codesniffer": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "PHPStats\\": "src/PHPStats",
-                    "ReverseRegex\\": "src/ReverseRegex"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Alannah Kearney",
-                    "email": "hi@alannahkearney.com",
-                    "homepage": "https://github.com/pointybeard"
-                },
-                {
-                    "name": "Lewis Dyer",
-                    "email": "getintouch@icomefromthenet.com",
-                    "homepage": "http://www.icomefromthenet.com"
-                }
-            ],
-            "description": "Convert Regular Expressions into text, for testing",
-            "homepage": "http://github.com/pointybeard-forks/ReverseRegex",
-            "keywords": [
-                "generator",
-                "regex",
-                "test data",
-                "testing"
-            ],
-            "support": {
-                "issues": "https://github.com/pointybeard-forks/ReverseRegex/issues",
-                "source": "https://github.com/pointybeard-forks/reverse-regex/tree/1.0.0.4",
-                "wiki": "https://github.com/pointybeard-forks/ReverseRegex/wiki"
-            },
-            "time": "2024-04-17T03:40:03+00:00"
         },
         {
             "name": "psr/http-message",
@@ -4737,11 +4733,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.2.7",
+            "version": "2.2.8",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/692db47b9dddb0487934e5236e77d48594aef921",
-                "reference": "692db47b9dddb0487934e5236e77d48594aef921",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e285254e60f33c21902efef4a926ca0987c06804",
+                "reference": "e285254e60f33c21902efef4a926ca0987c06804",
                 "shasum": ""
             },
             "require": {
@@ -4797,7 +4793,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-29T17:39:32+00:00"
+            "time": "2026-08-04T22:21:45+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
