@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e986164c37a59b34fa77282140e9154e",
+    "content-hash": "bd690250f381da0f47c4c83bc8671d7c",
     "packages": [
         {
             "name": "ckr/arraymerger",
@@ -51,23 +51,23 @@
         },
         {
             "name": "codeinc/http-reason-phrase-lookup",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/CodeIncHQ/HttpReasonPhraseLookup.git",
-                "reference": "efb6d986a627ee9b24e8c6b3f305baeb58070a35"
+                "url": "https://github.com/codeinchq/http-reason-phrase-lookup.git",
+                "reference": "71517204e9331aecdf13136240999c7dadae1d74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CodeIncHQ/HttpReasonPhraseLookup/zipball/efb6d986a627ee9b24e8c6b3f305baeb58070a35",
-                "reference": "efb6d986a627ee9b24e8c6b3f305baeb58070a35",
+                "url": "https://api.github.com/repos/codeinchq/http-reason-phrase-lookup/zipball/71517204e9331aecdf13136240999c7dadae1d74",
+                "reference": "71517204e9331aecdf13136240999c7dadae1d74",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "php": ">=8.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7"
+                "phpunit/phpunit": "^10.5 || ^11"
             },
             "type": "library",
             "autoload": {
@@ -87,13 +87,13 @@
                     "role": "developer"
                 }
             ],
-            "description": "A class to lookup HTTP reason phrases",
-            "homepage": "https://github.com/CodeIncHQ/HttpReasonPhraseLookup",
+            "description": "A PHP library to lookup HTTP status reason phrases",
+            "homepage": "https://github.com/CodeIncHQ/http-reason-phrase-lookup",
             "support": {
-                "issues": "https://github.com/CodeIncHQ/HttpReasonPhraseLookup/issues",
-                "source": "https://github.com/CodeIncHQ/HttpReasonPhraseLookup/tree/master"
+                "issues": "https://github.com/codeinchq/http-reason-phrase-lookup/issues",
+                "source": "https://github.com/codeinchq/http-reason-phrase-lookup/tree/2.0.0"
             },
-            "time": "2018-06-12T11:08:54+00:00"
+            "time": "2026-04-15T19:28:06+00:00"
         },
         {
             "name": "devizzent/cebe-php-openapi",
