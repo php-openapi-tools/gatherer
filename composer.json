@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.4",
         "ckr/arraymerger": "^3.0",
-        "codeinc/http-reason-phrase-lookup": "^1.0",
+        "codeinc/http-reason-phrase-lookup": "^1.0 || ^2.0",
         "devizzent/cebe-php-openapi": "^1.0.3",
         "eventsauce/object-hydrator": "^1.4",
         "ilario-pierbattista/reverse-regex": "^0.6.0",
