@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93cfda35d02b601ab74d82a8529e2b59",
+    "content-hash": "e986164c37a59b34fa77282140e9154e",
     "packages": [
         {
             "name": "ckr/arraymerger",
@@ -1025,6 +1025,57 @@
                 }
             ],
             "time": "2026-08-24T15:20:45+00:00"
+        },
+        {
+            "name": "openapi-tools/test-data",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-openapi-tools/test-data.git",
+                "reference": "7bce080543e3f8a1dc24c41c0e66afd713057b12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-openapi-tools/test-data/zipball/7bce080543e3f8a1dc24c41c0e66afd713057b12",
+                "reference": "7bce080543e3f8a1dc24c41c0e66afd713057b12",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "devizzent/cebe-php-openapi": "^1.1",
+                "wyrihaximus/async-test-utilities": "^13.5.0",
+                "wyrihaximus/makefiles": "^0.13.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OpenAPITools\\TestData\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cees-Jan Kiewiet",
+                    "email": "ceesjank@gmail.com"
+                }
+            ],
+            "description": "Test Data for OpenAPI Tools",
+            "support": {
+                "issues": "https://github.com/php-openapi-tools/test-data/issues",
+                "source": "https://github.com/php-openapi-tools/test-data/tree/0.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/WyriHaximus",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-25T15:09:57+00:00"
         },
         {
             "name": "openapi-tools/utils",
@@ -4290,57 +4341,6 @@
                 "source": "https://github.com/OndraM/ci-detector/tree/4.2.0"
             },
             "time": "2024-03-12T13:22:30+00:00"
-        },
-        {
-            "name": "openapi-tools/test-data",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-openapi-tools/test-data.git",
-                "reference": "7d1646265a04599930ef5eea903ba9fa98b7940f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-openapi-tools/test-data/zipball/7d1646265a04599930ef5eea903ba9fa98b7940f",
-                "reference": "7d1646265a04599930ef5eea903ba9fa98b7940f",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.4"
-            },
-            "require-dev": {
-                "wyrihaximus/async-test-utilities": "^13.5.0",
-                "wyrihaximus/makefiles": "^0.13.3"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "OpenAPITools\\TestData\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Cees-Jan Kiewiet",
-                    "email": "ceesjank@gmail.com"
-                }
-            ],
-            "description": "Test Data for OpenAPI Tools",
-            "support": {
-                "issues": "https://github.com/php-openapi-tools/test-data/issues",
-                "source": "https://github.com/php-openapi-tools/test-data/tree/main"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/WyriHaximus",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-08-03T06:12:25+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -10976,9 +10976,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "openapi-tools/test-data": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
