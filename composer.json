@@ -28,7 +28,7 @@
     },
     "require-dev": {
         "openapi-tools/test-data": "dev-main",
-        "wyrihaximus/async-test-utilities": "^13.5.1",
+        "wyrihaximus/async-test-utilities": "^14.1.0",
         "wyrihaximus/makefiles": "^0.13.3"
     },
     "autoload": {
