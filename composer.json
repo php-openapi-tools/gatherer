@@ -14,7 +14,7 @@
         "codeinc/http-reason-phrase-lookup": "^1.0",
         "devizzent/cebe-php-openapi": "^1.0.3",
         "eventsauce/object-hydrator": "^1.4",
-        "ilario-pierbattista/reverse-regex": "^0.6.0",
+        "ilario-pierbattista/reverse-regex": "^0.6.0 || ^0.7.0",
         "jawira/case-converter": "^3.5.1",
         "kwn/number-to-words": "^2.9.1",
         "nikic/php-parser": "^5.0",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e986164c37a59b34fa77282140e9154e",
+    "content-hash": "72718ddedce4d05a13efb529161a3531",
     "packages": [
         {
             "name": "ckr/arraymerger",
@@ -430,16 +430,16 @@
         },
         {
             "name": "ilario-pierbattista/reverse-regex",
-            "version": "0.6.0",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ilario-pierbattista/ReverseRegex.git",
-                "reference": "09b92b2873bd4f4bdedce8ec341d4efd156b6478"
+                "reference": "3028c0b5808d01b60d616ae3b345a23883898d0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ilario-pierbattista/ReverseRegex/zipball/09b92b2873bd4f4bdedce8ec341d4efd156b6478",
-                "reference": "09b92b2873bd4f4bdedce8ec341d4efd156b6478",
+                "url": "https://api.github.com/repos/ilario-pierbattista/ReverseRegex/zipball/3028c0b5808d01b60d616ae3b345a23883898d0b",
+                "reference": "3028c0b5808d01b60d616ae3b345a23883898d0b",
                 "shasum": ""
             },
             "require": {
@@ -485,9 +485,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ilario-pierbattista/ReverseRegex/issues",
-                "source": "https://github.com/ilario-pierbattista/ReverseRegex/tree/0.6.0"
+                "source": "https://github.com/ilario-pierbattista/ReverseRegex/tree/0.7.0"
             },
-            "time": "2026-03-31T04:46:46+00:00"
+            "time": "2026-10-10T10:11:05+00:00"
         },
         {
             "name": "jawira/case-converter",
